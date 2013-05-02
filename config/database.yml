@@ -1,0 +1,14 @@
+development: &default
+  adapter: postgresql
+  host: localhost
+  encoding: unicode
+  database: bambinosfc-development
+  pool: 5
+
+test:
+  <<: *default
+  database: bambinosfc-test
+
+production:
+  <<: *default
+  database: bambinosfc-production

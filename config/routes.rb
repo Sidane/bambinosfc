@@ -1,4 +1,6 @@
 Bambinosfc::Application.routes.draw do
+  root to: 'home#show'
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

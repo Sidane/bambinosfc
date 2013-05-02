@@ -1,0 +1,9 @@
+<h2>League Table</h2>
+<%= LeagueTablePresenter.new(@teams, self).render %>
+
+<h2>Bambinos FC Goalscorers</h2>
+<ul>
+<% @goalscorers.each do |player| %>
+  <li><%= player.number %>. <%= player.full_name %> - <%= player.goals_scored %></li>
+<% end %>
+</ul>

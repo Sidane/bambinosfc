@@ -7,4 +7,8 @@ class Player < ActiveRecord::Base
   def full_name
     "#{first_name} #{last_name}"
   end
+
+  def goals_scored
+    goals.count
+  end
 end

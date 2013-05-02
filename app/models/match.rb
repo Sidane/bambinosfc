@@ -7,6 +7,10 @@ class Match < ActiveRecord::Base
   has_many :goals
   has_many :goalscorers, through: :goals
 
+  scope :home_win, where("home_score > away_score")
+  scope :away_win, where("away_score > home_score")
+  scope :draw, where("home_score = away_score")
+
   def title
     "#{home_team.name} #{home_score}:#{away_score} #{away_team.name}"
   end

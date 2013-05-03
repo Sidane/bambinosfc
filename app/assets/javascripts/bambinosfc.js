@@ -18,59 +18,83 @@ jQuery(function($) {
       .attr("width", svgWidth)
       .attr("height", svgHeight);
 
-  var data = [ { x: 0, y: 100 }, { x: 100, y: 300 }, { x: 100, y: 500 } ];
+  // var data = [ { x: 0, y: 100 }, { x: 100, y: 300 }, { x: 100, y: 500 } ];
 
   var pointColour = d3.scale.category20b();
+  var index = 0;
 
-  updateScales(Object.keys(teamPointsByMatchday).length, getHighestPointsInLeague(teamPointsByMatchday));
+  updateScales(teamPointsByMatchday.length, getHighestPointsInLeague(teamPointsByMatchday));
+  console.log(teamPointsByMatchday.length);
 
   var chart = d3.select('svg')
     .append('g')
     .classed('chart', true)
     .attr('transform', translateString(xPad, yPad));
 
-  var g = chart.selectAll('circle')
-    .data(data)
-    .enter()
-    .append('g')
-    .attr('transform', function(d) { return translateString(d.x, d.y); });
 
-  g.append('circle')
-    .attr('fill', function(d, i) { return pointColour(i); })
-    .attr('r', 30);
+  $(document).click(function() {
+    index = (index + 1) % teamPointsByMatchday.length;
+    console.log(index);
+    onData(teamPointsByMatchday[index]);
+  });
 
-  g.append('text')
-    .text('XX')
-    .attr('x', function(d) { return - this.getBBox().width / 4; })
-    .attr('y', function(d) { return this.getBBox().height / 4; })
-    .style({ 'font-family': 'Helvetica', 'fill': '#fff', 'font-size': '10px' });
 
-  chart
-    .append('g')
-    .attr('transform', translateString(0, canvasHeight))
-    .attr('id','xAxis')
-    .call(makeXAxis);
+  /*
+    Enter
+  */
+  function onData(data) {
+    function teamTransform(d) { return translateString(xScale(index+1), yScale(d.points)); }
 
-  chart
-    .append('g')
-    .attr('id','yAxis')
-    .call(makeYAxis);
+    var g = chart.selectAll('g.team')
+      .data(data, function(d) { return d.name; })
+      .enter()
+      .append('g')
+      .classed('team', true)
+      .attr('transform', teamTransform);
+
+    g.append('circle')
+      .attr('fill', function(d, i) { return pointColour(i); })
+      .attr('r', 30);
+
+    g.append('text')
+      .text(function(d) { return d.name; })
+      .attr('x', function(d) { return - this.getBBox().width / 4; })
+      .attr('y', function(d) { return this.getBBox().height / 4; })
+      .style({ 'font-family': 'Helvetica', 'fill': '#fff', 'font-size': '10px' });
+
+    chart
+      .append('g')
+      .attr('transform', translateString(0, canvasHeight))
+      .classed('axis', true)
+      .attr('id','xAxis')
+      .call(makeXAxis);
+
+    chart
+      .append('g')
+      .attr('id','yAxis')
+      .classed('axis', true)
+      .call(makeYAxis);
+
+
+    /*
+      Update
+    */
+    d3.selectAll('g.team')
+      .transition()
+      .duration(1500)
+      .attr('transform', teamTransform);
+  }
+
+  onData(teamPointsByMatchday[index]);
+
 
   function getHighestPointsInLeague(data) {
-    var totals = data[Object.keys(data).sort().pop()];
-
-    var values = [];
-
-    for ( var key in totals ) {
-      values.push(totals[key]);
-    }
-
-    return d3.max(values);
+    return d3.max(data.pop(), function(d) { return d.points; });
   }
 
   function updateScales(xMax, yMax) {
     xScale = d3.scale.ordinal()
-              .domain(Object.keys(teamPointsByMatchday))
+              .domain(range(1, xMax))
               .rangeBands([0, canvasWidth]);
 
     yScale = d3.scale.linear()
@@ -92,5 +116,13 @@ jQuery(function($) {
 
   function translateString(x, y) {
     return 'translate(' + x + ',' + y + ')';
+  }
+
+  function range(start, end) {
+    var foo = [];
+    for (var i = start; i <= end; i++) {
+      foo.push(i);
+    }
+    return foo;
   }
 });

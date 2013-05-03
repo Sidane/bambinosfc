@@ -2,8 +2,13 @@
 <%= LeagueTablePresenter.new(@teams, self).render %>
 
 <h2>Bambinos FC Goalscorers</h2>
-<ul>
+<dl>
 <% @goalscorers.each do |player| %>
-  <li><%= player.number %>. <%= player.full_name %> - <%= player.goals_scored %></li>
+  <dt>
+    <%= image_tag(player.image) %> <%= player.number %>. <%= player.full_name %>
+  </dt>
+  <dd>
+    <%= player.goals_scored %> goals
+  </dd>
 <% end %>
-</ul>
+</dl>

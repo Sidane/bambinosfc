@@ -5,19 +5,33 @@ class MatchdayPresenter
   end
 
   def team_points_by_matchday
-    matchdays = {}
+    matchdays = [teams_with_0_points_array]
 
-    Match.grouped_by_matchday.each_pair do |date, matches|
+    Match.grouped_by_matchday.each_value do |matches|
+      teams_array = matchdays.last.dup
+
       matches.each do |match|
+        home_team = teams_array.detect { |h| h[:name] == match.home_team.name }.dup
+        away_team = teams_array.detect { |h| h[:name] == match.away_team.name }.dup
+
         if match.draw?
-          teams_with_points_hash[match.home_team.name] += 1
-          teams_with_points_hash[match.away_team.name] += 1
+          home_team[:points] += 1
+          away_team[:points] += 1
         else
-          teams_with_points_hash[match.winner.name] += 3
+          if home_team[:name] == match.winner[:name]
+            home_team[:points] += 3
+          else
+            away_team[:points] += 3
+          end
         end
+
+        teams_array.reject! { |h| h[:name] == home_team[:name] }
+        teams_array.reject! { |h| h[:name] == away_team[:name] }
+        teams_array << home_team
+        teams_array << away_team
       end
 
-      matchdays[date] = teams_with_points_hash.dup
+      matchdays << teams_array
     end
 
     matchdays
@@ -25,9 +39,9 @@ class MatchdayPresenter
 
   private
 
-  def teams_with_points_hash
-    @teams_with_points_hash ||= Team.all.inject({}) do |memo, team|
-      memo[team.name] = 0
+  def teams_with_0_points_array
+    @teams_with_points_array ||= Team.all.inject([]) do |memo, team|
+      memo << { name: team.name, points: 0 }
       memo
     end
   end

@@ -12,3 +12,10 @@
   </dd>
 <% end %>
 </dl>
+
+<% content_for :footer do %>
+  <script type="text/javascript" charset="utf-8">
+    var matchesByDate = <%== @matches_by_date.to_json %>
+    var teamPointsByMatchday = <%== @team_points_by_matchday.to_json %>
+  </script>
+<% end %>

@@ -14,4 +14,23 @@ class Match < ActiveRecord::Base
   def title
     "#{home_team.name} #{home_score}:#{away_score} #{away_team.name}"
   end
+
+  def self.grouped_by_matchday
+    all.group_by(&:played_on)
+  end
+
+  def draw?
+    home_score == away_score
+  end
+
+  def winner
+    if home_score > away_score
+      home_team
+    elsif away_score > home_score
+      away_team
+    else
+      nil
+    end
+  end
+
 end
